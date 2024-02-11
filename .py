@@ -54,7 +54,7 @@ data_types = {
     'customer_id': 'INT',
     'product_id': 'INT',
     'quantity': 'INT',
-    'date_sale': 'DATE',  
+    'date_sale': 'DATE',   kk
 }
 df.to_sql('sales', con=engine, if_exists='replace', index=False)
 cursor = conn.cursor()
