@@ -12,8 +12,8 @@ num_transactions = 100
 sales_data = []
 for _ in range(num_transactions):
     transaction_id = fake.uuid4()
-    customer_id = fake.random_int(min=100, max=999)
-    product_id = fake.random_int(min=1, max=100)
+    customer_id = fake.random_int(min=1, max=10)
+    product_id = fake.random_int(min=1, max=10)
     quantity = fake.random_int(min=1, max=10)
     timestamp = fake.date_time_between(start_date='-1y', end_date='now')
 

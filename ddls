@@ -1,0 +1,110 @@
+CREATE TABLE dbo.Customer (
+    customer_id INT identity ,
+    customer_name VARCHAR(255) default null,
+    customer_email VARCHAR(255) default null, 
+    creation_date date, 
+    update_date date
+);
+
+CREATE TABLE dbo.Product (
+    product_id INT identity,
+    product_name VARCHAR(255),
+    price DECIMAL(10, 2),
+    creation_date date, 
+    update_date date
+);
+
+-- HUBS
+
+CREATE TABLE dv.H_Customers (
+    hk_cust_id UNIQUEIDENTIFIER DEFAULT NEWID(),
+    customer_id INT,
+    load_ts TIMESTAMP, 
+    source varchar (100)
+);
+
+CREATE TABLE dv.H_Products (
+    hk_prod_id UNIQUEIDENTIFIER DEFAULT NEWID(), 
+    product_id INT,
+    load_ts TIMESTAMP, 
+    source varchar (100)
+);
+
+CREATE TABLE  dv.H_Sales(
+    hk_sales_id UNIQUEIDENTIFIER DEFAULT NEWID(),
+    transaction_id varchar (200),
+    load_ts TIMESTAMP, 
+    source varchar (100)
+);
+-- Links
+
+CREATE TABLE dv.L_Customer_Sales (
+    lk_cust_sales UNIQUEIDENTIFIER DEFAULT NEWID(), 
+    hk_sales_id VARCHAR(200),
+    hk_cust_id VARCHAR(200),
+    load_ts TIMESTAMP, 
+    source varchar (100)
+    FOREIGN KEY (hk_sales_id) REFERENCES H_Sales(hk_sales_id),
+    FOREIGN KEY (hk_cust_id) REFERENCES H_Customers(hk_cust_id)
+);
+
+
+CREATE TABLE dv.L_Product_Sales (
+    lk_prod_sales UNIQUEIDENTIFIER DEFAULT NEWID(), 
+    hk_sales_id VARCHAR(200),
+    hk_prod_id VARCHAR(200),
+    load_ts TIMESTAMP, 
+    source varchar (100)
+    FOREIGN KEY (hk_sales_id) REFERENCES H_Sales(hk_sales_id),
+    FOREIGN KEY (hk_prod_id) REFERENCES H_Products(hk_prod_id)
+);
+-- satellites
+
+CREATE TABLE dv.S_Product_Current(
+    hk_prod_id VARCHAR (200),
+    product_id INT,
+    product_name VARCHAR(255),
+    price DECIMAL(10, 2),  
+    load_ts TIMESTAMP, 
+    source varchar (100),
+    PRIMARY KEY (hk_prod_id, load_ts),
+    FOREIGN KEY (hk_prod_id) REFERENCES H_Products(hk_prod_id)
+);
+
+CREATE TABLE dv.S_Product_Historical(
+    hk_prod_id VARCHAR (200),
+    product_id INT,
+    product_name VARCHAR(255),
+    price DECIMAL(10, 2), 
+    starting_date DATE,
+    ending_date DATE, 
+    load_ts TIMESTAMP, 
+    source varchar (100),
+    PRIMARY KEY (hk_prod_id, load_ts),
+    FOREIGN KEY (hk_prod_id) REFERENCES H_Products(hk_prod_id)
+);
+
+CREATE TABLE dv.S_Customers_Current(
+    hk_cust_id VARCHAR (200),
+    customer_id_id INT,
+    customer_name VARCHAR(255),
+    customer_email VARCHAR(255),  
+    load_ts TIMESTAMP, 
+    source varchar (100),
+    PRIMARY KEY (hk_cust_id, load_ts),
+    FOREIGN KEY (hk_cust_id) REFERENCES H_Customers(hk_cust_id)
+);
+
+CREATE TABLE dv.S_Customers_Historical(
+    hk_cust_id VARCHAR (200),
+    customer_id INT,
+    customer_name VARCHAR(255),
+    customer_email VARCHAR(255),  
+    starting_date DATE,
+    ending_date DATE, 
+    load_ts TIMESTAMP, 
+    source varchar (100),
+    PRIMARY KEY (hk_cust_id, load_ts),
+    FOREIGN KEY (hk_cust_id) REFERENCES H_Customers(hk_cust_id)
+);
+
